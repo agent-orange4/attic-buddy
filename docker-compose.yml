@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  attic:
+    image: ghcr.io/lmmendes/attic:latest
+    container_name: attic-web
+    # ... your existing attic config ...
+    restart: unless-stopped
+
+  attic-db:
+    image: postgres:16-alpine
+    container_name: attic-postgres
+    # ... your existing db config ...
+    restart: unless-stopped
+
+attic-buddy:
+    build: https://github.com/agent-orange4/attic-buddy.git#main
+    container_name: attic-buddy
+    ports:
+      - "9755:9755"
+    environment:
+      - ATTIC_URL=http://attic:9750
+      - ATTIC_EMAIL=${ATTIC_ADMIN_EMAIL}
+      - ATTIC_PASSWORD=${ATTIC_ADMIN_PASSWORD}
+    depends_on:
+      - attic
+    restart: unless-stopped
